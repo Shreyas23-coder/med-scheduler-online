@@ -40,7 +40,7 @@ const DoctorCard = ({ id, name, specialty, image, rating, fee, availability }: D
             <span className="text-xs text-gray-500">{availability}</span>
           </div>
           
-          <Button asChild className="w-full bg-medical-blue hover:bg-medical-blueHover">
+          <Button asChild className="w-full bg-medical-blue hover:bg-medical-blueHover text-white">
             <Link to={`/doctors/${id}`}>
               Book Appointment
             </Link>
