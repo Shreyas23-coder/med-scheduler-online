@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import NavBar from "@/components/NavBar";
@@ -29,8 +29,26 @@ type Doctor = {
 
 const DoctorDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [userSession, setUserSession] = useState<any>(null);
+
+  useEffect(() => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserSession(session);
+    });
+
+    // Set up auth listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUserSession(session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Fetch doctor details from Supabase
   const { data: doctor, isLoading, error } = useQuery({
@@ -69,17 +87,17 @@ const DoctorDetail = () => {
       return;
     }
 
-    // Check if user is authenticated (in a real app)
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) {
+    // Check if user is authenticated
+    if (!userSession) {
       toast.error("Please sign in to book an appointment");
+      navigate("/login");
       return;
     }
 
     try {
       const appointmentData = {
         doctor_id: id,
-        user_id: data.session.user.id,
+        user_id: userSession.user.id,
         date: format(selectedDate, "yyyy-MM-dd"),
         time: selectedTime,
         status: "pending",
@@ -93,8 +111,7 @@ const DoctorDetail = () => {
       if (error) throw error;
       
       toast.success("Appointment booked successfully");
-      setSelectedDate(undefined);
-      setSelectedTime(null);
+      navigate("/appointments");
     } catch (error) {
       console.error("Error booking appointment:", error);
       toast.error("Failed to book appointment");
@@ -199,46 +216,75 @@ const DoctorDetail = () => {
               <div className="md:col-span-2">
                 <h2 className="text-2xl font-bold mb-4">Book an Appointment</h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-medium mb-2">Select Date</h3>
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
-                      className="border rounded-md pointer-events-auto"
-                      disabled={(date) => 
-                        date < new Date() || 
-                        date > new Date(new Date().setDate(new Date().getDate() + 30))
-                      }
-                    />
-                  </div>
-                  
-                  <div>
-                    <h3 className="font-medium mb-2">Select Time</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {timeSlots.map((time) => (
-                        <Button
-                          key={time}
-                          variant={selectedTime === time ? "default" : "outline"}
-                          className={`text-sm ${selectedTime === time ? 'bg-medical-blue text-white' : ''}`}
-                          onClick={() => setSelectedTime(time)}
-                          disabled={!selectedDate}
-                        >
-                          {time}
-                        </Button>
-                      ))}
+                {!userSession ? (
+                  <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+                    <div className="flex justify-center mb-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-medical-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Please sign in to book an appointment</h3>
+                    <p className="text-gray-600 mb-6">You need to be signed in to schedule appointments with Dr. {doctor.name}</p>
+                    <div className="flex justify-center gap-4">
+                      <Button
+                        onClick={() => navigate("/login")}
+                        className="bg-medical-blue hover:bg-medical-blueHover text-white"
+                      >
+                        Sign In
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate("/register")}
+                        className="border-medical-blue text-medical-blue hover:bg-medical-blue/10"
+                      >
+                        Create Account
+                      </Button>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-medium mb-2">Select Date</h3>
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        className="border rounded-md pointer-events-auto"
+                        disabled={(date) => 
+                          date < new Date() || 
+                          date > new Date(new Date().setDate(new Date().getDate() + 30))
+                        }
+                      />
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium mb-2">Select Time</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {timeSlots.map((time) => (
+                          <Button
+                            key={time}
+                            variant={selectedTime === time ? "default" : "outline"}
+                            className={`text-sm ${selectedTime === time ? 'bg-medical-blue text-white' : ''}`}
+                            onClick={() => setSelectedTime(time)}
+                            disabled={!selectedDate}
+                          >
+                            {time}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
                 
-                <Button 
-                  onClick={bookAppointment}
-                  className="w-full mt-8 bg-medical-blue hover:bg-medical-blueHover text-white py-3"
-                  disabled={!selectedDate || !selectedTime}
-                >
-                  Book Appointment
-                </Button>
+                {userSession && (
+                  <Button 
+                    onClick={bookAppointment}
+                    className="w-full mt-8 bg-medical-blue hover:bg-medical-blueHover text-white py-3"
+                    disabled={!selectedDate || !selectedTime}
+                  >
+                    Book Appointment
+                  </Button>
+                )}
                 
                 <div className="mt-8">
                   <h3 className="text-xl font-bold mb-4">About Dr. {doctor.name.split(' ')[0]}</h3>
