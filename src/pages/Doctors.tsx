@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -135,7 +136,9 @@ const Doctors = () => {
                     
                     <div className="flex items-center justify-between">
                       <span className="text-green-600 font-medium">{doctor.availability || "Available Today"}</span>
-                      <Button className="bg-medical-blue hover:bg-medical-blueHover text-white">Book Now</Button>
+                      <Button asChild className="bg-medical-blue hover:bg-medical-blueHover text-white">
+                        <Link to={`/doctors/${doctor.id}`}>Book Now</Link>
+                      </Button>
                     </div>
                   </div>
                 </div>
