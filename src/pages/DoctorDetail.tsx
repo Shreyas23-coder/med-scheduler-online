@@ -10,6 +10,23 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Define Doctor type based on our database schema
+type Doctor = {
+  id: string;
+  name: string;
+  specialty: string;
+  location: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  availability: string;
+  bio: string | null;
+  experience: number;
+  fee: number;
+  created_at: string;
+  updated_at: string;
+};
+
 const DoctorDetail = () => {
   const { id } = useParams();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -19,18 +36,23 @@ const DoctorDetail = () => {
   const { data: doctor, isLoading, error } = useQuery({
     queryKey: ["doctor", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("doctors")
-        .select("*")
-        .eq("id", id)
-        .single();
-      
-      if (error) {
-        toast.error("Failed to load doctor details");
-        throw error;
+      try {
+        const { data, error } = await supabase
+          .from("doctors")
+          .select("*")
+          .eq("id", id)
+          .single();
+        
+        if (error) {
+          toast.error("Failed to load doctor details");
+          throw error;
+        }
+        
+        return data as Doctor;
+      } catch (err) {
+        console.error("Error fetching doctor details:", err);
+        throw err;
       }
-      
-      return data;
     },
   });
 
@@ -55,14 +77,18 @@ const DoctorDetail = () => {
     }
 
     try {
-      const { error } = await supabase.from("appointments").insert({
+      const appointmentData = {
         doctor_id: id,
         user_id: data.session.user.id,
         date: format(selectedDate, "yyyy-MM-dd"),
         time: selectedTime,
         status: "pending",
-        reason: "General Checkup", // This would come from a form in a real app
-      });
+        reason: "General Checkup" // This would come from a form in a real app
+      };
+
+      const { error } = await supabase
+        .from("appointments")
+        .insert(appointmentData);
 
       if (error) throw error;
       
@@ -138,7 +164,7 @@ const DoctorDetail = () => {
                         </svg>
                       ))}
                     </div>
-                    <span className="ml-2 text-gray-700">{doctor.rating} ({doctor.reviews || 0} reviews)</span>
+                    <span className="ml-2 text-gray-700">{doctor.rating} ({doctor.reviews} reviews)</span>
                   </div>
                   
                   <div className="mt-4">
@@ -152,20 +178,20 @@ const DoctorDetail = () => {
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-medical-blue mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
                       </svg>
-                      <span>{doctor.experience || 5}+ years experience</span>
+                      <span>{doctor.experience}+ years experience</span>
                     </div>
                     <div className="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-medical-blue mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V5z" clipRule="evenodd" />
                       </svg>
-                      <span>{doctor.availability || "Available Today"}</span>
+                      <span>{doctor.availability}</span>
                     </div>
                   </div>
                 </div>
                 
                 <div className="p-4 border rounded-lg mb-6">
                   <h3 className="font-semibold text-lg mb-2">Consultation Fee</h3>
-                  <p className="text-2xl font-bold text-medical-blue">${doctor.fee || 100}</p>
+                  <p className="text-2xl font-bold text-medical-blue">${doctor.fee}</p>
                 </div>
               </div>
               
@@ -217,7 +243,7 @@ const DoctorDetail = () => {
                 <div className="mt-8">
                   <h3 className="text-xl font-bold mb-4">About Dr. {doctor.name.split(' ')[0]}</h3>
                   <p className="text-gray-700">
-                    {doctor.bio || `Dr. ${doctor.name} is a highly experienced ${doctor.specialty} specialist with ${doctor.experience || 5}+ years of clinical experience. 
+                    {doctor.bio || `Dr. ${doctor.name} is a highly experienced ${doctor.specialty} specialist with ${doctor.experience}+ years of clinical experience. 
                     They are committed to providing compassionate and personalized care to all patients.`}
                   </p>
                 </div>

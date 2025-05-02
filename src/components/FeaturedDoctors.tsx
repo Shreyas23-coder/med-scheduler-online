@@ -3,24 +3,52 @@ import { useQuery } from "@tanstack/react-query";
 import DoctorCard from "./DoctorCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+
+// Define the Doctor type based on our Supabase schema
+type Doctor = {
+  id: string;
+  name: string;
+  specialty: string;
+  location: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  availability: string;
+  bio: string | null;
+  experience: number;
+  fee: number;
+  created_at: string;
+  updated_at: string;
+};
 
 const FeaturedDoctors = () => {
-  const { data: doctors, isLoading } = useQuery({
+  const { data: doctors, isLoading, error } = useQuery({
     queryKey: ["featuredDoctors"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("doctors")
-        .select("*")
-        .limit(4);
-      
-      if (error) {
-        console.error("Error loading featured doctors:", error);
+      try {
+        const { data, error } = await supabase
+          .from("doctors")
+          .select("*")
+          .limit(4);
+        
+        if (error) {
+          console.error("Error loading featured doctors:", error);
+          toast.error("Failed to load featured doctors");
+          return [];
+        }
+        
+        return data as Doctor[];
+      } catch (err) {
+        console.error("Error in featured doctors query:", err);
         return [];
       }
-      
-      return data || [];
     }
   });
+
+  if (error) {
+    console.error("Error in featured doctors query:", error);
+  }
 
   return (
     <section className="py-16">
@@ -57,14 +85,14 @@ const FeaturedDoctors = () => {
                   name={doctor.name} 
                   specialty={doctor.specialty}
                   image={doctor.image || "/public/lovable-uploads/6af26af9-e173-4e99-b91c-383040cbdcb5.png"}
-                  rating={doctor.rating || 4.8}
-                  fee={doctor.fee || 100}
-                  availability={doctor.availability || "Available Today"}
+                  rating={doctor.rating}
+                  fee={doctor.fee}
+                  availability={doctor.availability}
                 />
               ))
             ) : (
               <div className="col-span-4 text-center py-10">
-                <p className="text-gray-500">No doctors found. Add some doctors in Supabase.</p>
+                <p className="text-gray-500">No doctors found.</p>
               </div>
             )}
           </div>

@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          created_at: string
+          date: string
+          doctor_id: string
+          id: string
+          reason: string | null
+          status: string
+          time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          doctor_id: string
+          id?: string
+          reason?: string | null
+          status?: string
+          time: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          doctor_id?: string
+          id?: string
+          reason?: string | null
+          status?: string
+          time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidate_profiles: {
         Row: {
           created_at: string
@@ -42,6 +86,54 @@ export type Database = {
           skills?: string[]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      doctors: {
+        Row: {
+          availability: string | null
+          bio: string | null
+          created_at: string
+          experience: number | null
+          fee: number | null
+          id: string
+          image: string | null
+          location: string
+          name: string
+          rating: number | null
+          reviews: number | null
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          experience?: number | null
+          fee?: number | null
+          id?: string
+          image?: string | null
+          location: string
+          name: string
+          rating?: number | null
+          reviews?: number | null
+          specialty: string
+          updated_at?: string
+        }
+        Update: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          experience?: number | null
+          fee?: number | null
+          id?: string
+          image?: string | null
+          location?: string
+          name?: string
+          rating?: number | null
+          reviews?: number | null
+          specialty?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -278,6 +370,27 @@ export type Database = {
           raw_text?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      specialties: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
