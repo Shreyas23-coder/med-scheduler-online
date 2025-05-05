@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -193,7 +192,7 @@ const MyAppointments = () => {
           
           <Tabs defaultValue="upcoming" onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+              <TabsTrigger value="upcoming">Confirmed</TabsTrigger>
               <TabsTrigger value="past">Past & Cancelled</TabsTrigger>
             </TabsList>
             
