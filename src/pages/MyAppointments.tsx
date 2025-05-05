@@ -132,7 +132,7 @@ const MyAppointments = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge className="bg-yellow-500">Pending</Badge>;
+        return <Badge className="bg-[#F9B208] text-white">Pending</Badge>;
       case "confirmed":
         return <Badge className="bg-green-500">Confirmed</Badge>;
       case "cancelled":
