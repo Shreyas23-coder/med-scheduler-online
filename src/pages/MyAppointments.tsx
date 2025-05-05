@@ -10,6 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+// Define the expected shape of doctor data
+interface Doctor {
+  name: string;
+  specialty: string;
+  image: string | null;
+}
+
+// Define the appointment interface that will be used in the component
 type Appointment = {
   id: string;
   doctor_id: string;
@@ -17,12 +25,19 @@ type Appointment = {
   time: string;
   status: string;
   reason: string | null;
-  doctor: {
-    name: string;
-    specialty: string;
-    image: string | null;
-  };
+  doctor: Doctor;
 };
+
+// Define the raw shape of data coming directly from Supabase
+interface RawAppointmentData {
+  id: string;
+  doctor_id: string;
+  date: string;
+  time: string;
+  status: string;
+  reason: string | null;
+  doctors: Doctor;
+}
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -72,7 +87,20 @@ const MyAppointments = () => {
       
       if (error) throw error;
       
-      setAppointments(data || []);
+      if (data) {
+        // Transform the data to map from "doctors" to "doctor" property
+        const transformedAppointments: Appointment[] = data.map((item: RawAppointmentData) => ({
+          id: item.id,
+          doctor_id: item.doctor_id,
+          date: item.date,
+          time: item.time,
+          status: item.status,
+          reason: item.reason,
+          doctor: item.doctors // Map from doctors to doctor
+        }));
+        
+        setAppointments(transformedAppointments);
+      }
     } catch (error) {
       console.error("Error fetching appointments:", error);
       toast.error("Failed to load appointments");
