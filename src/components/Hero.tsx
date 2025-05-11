@@ -18,9 +18,9 @@ const Hero = () => {
             </p>
             <div className="flex flex-wrap gap-4 mt-8">
               <div className="flex -space-x-2">
-                <img className="w-10 h-10 rounded-full border-2 border-white" src="/public/lovable-uploads/6af26af9-e173-4e99-b91c-383040cbdcb5.png" alt="Doctor Avatar" />
-                <img className="w-10 h-10 rounded-full border-2 border-white" src="/public/lovable-uploads/6af26af9-e173-4e99-b91c-383040cbdcb5.png" alt="Doctor Avatar" />
-                <img className="w-10 h-10 rounded-full border-2 border-white" src="/public/lovable-uploads/6af26af9-e173-4e99-b91c-383040cbdcb5.png" alt="Doctor Avatar" />
+                <img className="w-10 h-10 rounded-full border-2 border-white" src="/public/lovable-uploads/df523a0a-3d43-4dc8-9b7b-7067098be42f.png" alt="Doctor Avatar" />
+                <img className="w-10 h-10 rounded-full border-2 border-white" src="/public/lovable-uploads/df523a0a-3d43-4dc8-9b7b-7067098be42f.png" alt="Doctor Avatar" />
+                <img className="w-10 h-10 rounded-full border-2 border-white" src="/public/lovable-uploads/df523a0a-3d43-4dc8-9b7b-7067098be42f.png" alt="Doctor Avatar" />
               </div>
             </div>
             <Button asChild className="bg-white text-medical-blue hover:bg-gray-100 rounded-full px-6 py-6 h-12 mt-4">
