@@ -25,9 +25,9 @@ const Hero = () => {
           
           <div className="hidden md:block">
             <img 
-              src="/public/lovable-uploads/7967c4e9-96e9-4830-bbbd-f7b6e37ecbcf.png" 
-              alt="Medical Team" 
-              className="object-cover h-full w-full" 
+              src="/lovable-uploads/2e0a5725-0b9c-44df-941b-0eea473c6c8c.png" 
+              alt="Doctor in white coat" 
+              className="object-contain h-full w-full" 
             />
           </div>
         </div>
