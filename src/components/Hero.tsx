@@ -13,8 +13,8 @@ const Hero = () => {
               With Trusted Doctors
             </h1>
             <p className="text-lg md:text-xl text-blue-100 max-w-md">
-              Simply browse through our extensive list of trusted doctors, 
-              schedule your appointment hassle-free.
+              We are a user-friendly platform that helps patients book doctor appointments 
+              online with ease and convenience.
             </p>
             <Button asChild className="bg-white text-medical-blue hover:bg-gray-100 rounded-full px-6 py-6 h-12 mt-4">
               <Link to="/doctors">
