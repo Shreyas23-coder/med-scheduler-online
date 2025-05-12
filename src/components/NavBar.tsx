@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { LogOut, User } from "lucide-react";
 import { toast } from "sonner";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel,
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 const NavBar = () => {
   const [user, setUser] = useState<any>(null);
@@ -74,16 +82,27 @@ const NavBar = () => {
 
           <div className="flex items-center space-x-4">
             {user ? (
-              <>
-                <Button variant="ghost" size="sm" className="text-gray-600 flex items-center gap-2" onClick={() => navigate("/profile")}>
-                  <User size={16} />
-                  <span className="hidden sm:inline">Account</span>
-                </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600" onClick={handleLogout}>
-                  <LogOut size={16} className="mr-2" />
-                  <span className="hidden sm:inline">Sign Out</span>
-                </Button>
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-gray-600 flex items-center gap-2">
+                    <User size={16} />
+                    <span className="hidden sm:inline">Account</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/appointments")}>
+                    My Appointments
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut size={16} className="mr-2" /> Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <Button asChild variant="ghost" className="text-gray-600">
